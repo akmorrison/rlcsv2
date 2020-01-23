@@ -7,9 +7,42 @@
 #include "Arduino.h"
 #include "sd_handler.h"
 
+void write_serial(daq_holder_t* input){
+    Serial.print("pressure1=");
+    Serial.println(input -> pressure1);
+    Serial.print("pressure2=");
+    Serial.println(input -> pressure2);
+    Serial.print("pressure3=");
+    Serial.println(input -> pressure3);
+    Serial.print("rocket_mass=");
+    Serial.println(input -> rocket_mass);
+    Serial.print("ign_pri_current=");
+    Serial.println(input -> ign_pri_current);
+    Serial.print("ign_sec_current=");
+    Serial.println(input -> ign_sec_current);
+    Serial.print("rfill_lsw_open=");
+    Serial.println(input -> rfill_lsw_open);
+    Serial.print("rfill_lsw_closed=");
+    Serial.println(input -> rfill_lsw_closed);
+    Serial.print("rvent_lsw_open=");
+    Serial.println(input -> rvent_lsw_open);
+    Serial.print("rvent_lsw_closed=");
+    Serial.println(input -> rvent_lsw_closed);
+
+    Serial.print("rocketvent_valve_state=");
+    Serial.println(input -> rocketvent_valve_state);
+    Serial.print("injector_valve_state=");
+    Serial.println(input -> injector_valve_state);
+
+    Serial.print("linac_lsw_extend=");
+    Serial.println(input -> linac_lsw_extend);
+    Serial.print("linac_lsw_retract=");
+    Serial.println(input -> linac_lsw_retract);
+}
 
 void setup()
 {
+    Serial.begin(9600);
     lcd_init();
     start_SevSeg();
     radio_init();
@@ -49,8 +82,10 @@ void loop()
   //update the LCD
   lcd_update(get_tower_daq());
 
-  //check how long since we received tower state
+  // write data to serial
+  write_serial(get_tower_daq());
 
+  //check how long since we received tower state
   if (millis_offset() - global_time_last_tower_state_req > global_tower_update_interval){
     client_request_state();
   }
@@ -84,4 +119,3 @@ void loop()
         flush();
     }
 }
-
