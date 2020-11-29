@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <xc.h>
 #include "i2c.h"
-#include "relay_general.h"
+#include "i2c_pancake.h"
 #include "timer.h"
 
 #define MAX_LOOP_TIME_DIFF_CONST 100

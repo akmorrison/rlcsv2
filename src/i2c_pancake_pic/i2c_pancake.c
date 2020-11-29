@@ -1,7 +1,7 @@
 #include <xc.h>
-#include "relay_general.h"
+#include "i2c_pancake.h"
 
-static uint16_t analog_inputs[2];
+uint16_t analog_inputs[2];
 uint16_t read_analog_inputs(uint8_t port) {
     ADCON0 = 0x01 | (port << 2); // Turn ADC on, select port to read from
     ADCON0 |= 1 << 1; // set b[1] "go" bit

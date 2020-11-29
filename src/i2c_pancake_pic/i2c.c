@@ -1,5 +1,5 @@
 #include "i2c.h"
-#include "relay_general.h"
+#include "i2c_pancake.h"
 
 uint16_t i2cSlaveRecv; // Data received on i2c
 uint16_t i2cSlaveSend; // Data to be sent on i2c

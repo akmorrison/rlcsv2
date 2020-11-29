@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-uint16_t analog_inputs[2];
+extern uint16_t analog_inputs[2];
 
 uint16_t read_analog_inputs(uint8_t port);
 
