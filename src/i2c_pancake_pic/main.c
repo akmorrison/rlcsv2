@@ -7,10 +7,14 @@
 
 #define MAX_LOOP_TIME_DIFF_CONST 100
 
-#define CURR_SENSE_1 1
-#define CURR_SENSE_2 0
+// Define Analog Channels
+#define STRAIN1 0
+#define STRAIN2 1
+#define STRAIN3 2
+#define PRESSURE1 10
+#define PRESSURE2 9
 
-uint16_t dip_inputs;
+uint16_t dip_inputs = 0;
 
 static void __interrupt() interrupt_handler(void) {
     //We received a i2c request from master, handle it.
@@ -27,10 +31,10 @@ static void __interrupt() interrupt_handler(void) {
 
 void read_dip_inputs(void) {
     uint16_t new_dip = 0;
-    new_dip |= (!PORTBbits.RB3) ? (1) : 0;       //LSB
-    new_dip |= (!PORTBbits.RB2) ? (1 << 1) : 0;
-    new_dip |= (!PORTBbits.RB0) ? (1 << 2) : 0;
-    new_dip |= (!PORTAbits.RA4) ? (1 << 3) : 0;  //MSB
+    new_dip |= (!PORTAbits.RA6) ? (1) : 0;       //LSB
+    new_dip |= (!PORTAbits.RA5) ? (1 << 1) : 0;
+    new_dip |= (!PORTAbits.RA4) ? (1 << 2) : 0;
+    new_dip |= (!PORTAbits.RA3) ? (1 << 3) : 0;  //MSB
     if(dip_inputs != new_dip) {
         dip_inputs = new_dip;
         i2c_slave_init(dip_inputs); //reinitialize i2c slave module with new slave address
@@ -38,23 +42,25 @@ void read_dip_inputs(void) {
 }
 
 void setup(void) {
-    TRISAbits.TRISA0 = 1;   //CURR_SENSE_2
-    TRISAbits.TRISA1 = 1;   //CURR_SENSE_1
-    TRISAbits.TRISA2 = 0;   //POWER
-    TRISAbits.TRISA3 = 0;   //SELECT
-    TRISAbits.TRISA4 = 1;   //DIP_1
-    TRISAbits.TRISA6 = 1;   //LIM2
-    TRISAbits.TRISA7 = 1;   //LIM1
-    TRISBbits.TRISB0 = 1;   //DIP_2
-    TRISBbits.TRISB2 = 1;   //DIP_3
-    TRISBbits.TRISB3 = 1;   //DIP_4
-    TRISBbits.TRISB5 = 0;   //LED
+    TRISAbits.TRISA3 = 1; // DIP 1
+    TRISAbits.TRISA4 = 1; // DIP 2
+    TRISAbits.TRISA5 = 1; // DIP 3
+    TRISAbits.TRISA6 = 1; // DIP 4
+    TRISAbits.TRISA0 = 1; // STRAIN 1
+    TRISAbits.TRISA1 = 1; // STRAIN 2
+    TRISAbits.TRISA2 = 1; // STRAIN 3
+    TRISBbits.TRISB2 = 1; // PRESSURE 1
+    TRISBbits.TRISB3 = 1; // PRESSURE 2
+    TRISBbits.TRISB5 = 0; // LED
 
-    ANSELA = 0;             //DISABLE ANALOG INPUT ON PORT A, then enable port 0 and 1
-    ANSELAbits.ANSA0 = 1;   //CURR_SENSE_2
-    ANSELAbits.ANSA1 = 1;   //CURR_SENSE_1
+    ANSELA = 0;             // Enable Analog Inputs on Port A
+    ANSELAbits.ANSA0 = 1;
+    ANSELAbits.ANSA1 = 1;
+    ANSELAbits.ANSA2 = 1;
 
-    ANSELB = 0;             //DISABLE ANALOG INPUT ON PORT B
+    ANSELB = 0;             // Enable Analog Inputs on Port B
+    ANSELBbits.ANSB2 = 1;
+    ANSELBbits.ANSB3 = 1;
 
     // Configure FVR module
     // b[7] enables FVR
@@ -70,8 +76,6 @@ void setup(void) {
 int main(int argc, char** argv) {
     setup();                    //Set up digital + analog I/O
     timer0_init();              //Initialize timer
-    set_power_on();
-    set_select_off();
     set_led_off();
     dip_inputs = 0;
     i2c_slave_init(dip_inputs);
@@ -85,12 +89,15 @@ int main(int argc, char** argv) {
             //One day I will configure this correctly, but ATM we only need the LED to blink ;-;
             last_millis = millis();
 
-            led_heartbeat();
+            //led_heartbeat();
         }
 
-        read_analog_inputs(CURR_SENSE_1);
-        read_analog_inputs(CURR_SENSE_2);
-
+        read_analog_inputs(STRAIN1, 0);
+        read_analog_inputs(STRAIN2, 1);
+        read_analog_inputs(STRAIN3, 2);
+        read_analog_inputs(PRESSURE1, 3);
+        read_analog_inputs(PRESSURE2, 4);
+        
         read_dip_inputs(); //Check if dip switch input has changed, re-init i2c if so
     }
     return (EXIT_SUCCESS);

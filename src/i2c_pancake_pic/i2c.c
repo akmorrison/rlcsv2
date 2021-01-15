@@ -41,9 +41,9 @@ void i2c_handle_interrupt(void) {
         while(!BF);
         i2cSlaveRecv = SSP1BUF;
         if (i2cSlaveRecv == 2) {
-            set_select_on();
+            set_led_on();
         } else {
-            set_select_off();
+            set_led_off();
         }
         SSPCONbits.CKP = 1;
         BF = 0;
@@ -59,17 +59,15 @@ void i2c_handle_interrupt(void) {
         }
         temp = SSPBUF;
         BF = 0;
-        if (read_pointer == 0) {
-            SSPBUF = (get_lim2() << 1) | get_lim1();
-        } else if (read_pointer == 1) {
-            SSPBUF = (uint8_t)(analog_inputs[0]);
-        } else if (read_pointer == 2) {
-            SSPBUF = (uint8_t)(analog_inputs[0] >> 8);
-        } else if (read_pointer == 3) {
-            SSPBUF = (uint8_t)(analog_inputs[1]);
-        } else if (read_pointer == 4) {
-            SSPBUF = (uint8_t)(analog_inputs[1] >> 8);
-        }
+        
+        for (uint8_t x = 0; x < NUM_INPUTS; x++) {
+            if (read_pointer == x * 2) {
+                SSPBUF = (uint8_t)(analog_inputs[x]);
+            }
+            if (read_pointer == (x * 2) + 1) {
+                SSPBUF = (uint8_t)(analog_inputs[x] >> 8);
+            }
+        } // for
         read_pointer++;
         SSPCONbits.CKP = 1;
         while(SSPSTATbits.BF);
