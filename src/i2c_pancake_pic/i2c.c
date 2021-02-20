@@ -67,6 +67,8 @@ void i2c_handle_interrupt(void) {
             if (read_pointer == (x * 2) + 1) {
                 SSPBUF = (uint8_t)(analog_inputs[x] >> 8);
             }
+            
+//            SSPBUF = 'R';
         } // for
         read_pointer++;
         SSPCONbits.CKP = 1;

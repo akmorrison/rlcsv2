@@ -31,10 +31,10 @@ static void __interrupt() interrupt_handler(void) {
 
 void read_dip_inputs(void) {
     uint16_t new_dip = 0;
-    new_dip |= (!PORTAbits.RA6) ? (1) : 0;       //LSB
-    new_dip |= (!PORTAbits.RA5) ? (1 << 1) : 0;
-    new_dip |= (!PORTAbits.RA4) ? (1 << 2) : 0;
-    new_dip |= (!PORTAbits.RA3) ? (1 << 3) : 0;  //MSB
+    new_dip |= (!PORTAbits.RA3) ? (1 << 0) : 0;
+    new_dip |= (!PORTAbits.RA4) ? (1 << 1) : 0;
+    //new_dip |= (!PORTAbits.RA7) ? (1 << 2) : 0; // Stuck at HIGH ?!?
+    new_dip |= (!PORTAbits.RA6) ? (1 << 3) : 0;
     if(dip_inputs != new_dip) {
         dip_inputs = new_dip;
         i2c_slave_init(dip_inputs); //reinitialize i2c slave module with new slave address
@@ -44,7 +44,7 @@ void read_dip_inputs(void) {
 void setup(void) {
     TRISAbits.TRISA3 = 1; // DIP 1
     TRISAbits.TRISA4 = 1; // DIP 2
-    TRISAbits.TRISA5 = 1; // DIP 3
+    TRISAbits.TRISA7 = 1; // DIP 3
     TRISAbits.TRISA6 = 1; // DIP 4
     TRISAbits.TRISA0 = 1; // STRAIN 1
     TRISAbits.TRISA1 = 1; // STRAIN 2
@@ -85,13 +85,16 @@ int main(int argc, char** argv) {
 
     while (1) {
         //Heartbeat
-        if (millis() - last_millis > MAX_LOOP_TIME_DIFF_CONST) {
-            //One day I will configure this correctly, but ATM we only need the LED to blink ;-;
-            last_millis = millis();
-
-            //led_heartbeat();
-        }
-
+//        if (millis() - last_millis > MAX_LOOP_TIME_DIFF_CONST) {
+//            //One day I will configure this correctly, but ATM we only need the LED to blink ;-;
+//            last_millis = millis();
+//
+//            led_heartbeat();
+//        }
+        
+        if (analog_inputs[0] > 100) { set_led_on(); }
+        else { set_led_off(); }
+        
         read_analog_inputs(STRAIN1, 0);
         read_analog_inputs(STRAIN2, 1);
         read_analog_inputs(STRAIN3, 2);
