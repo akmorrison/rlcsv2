@@ -10,7 +10,7 @@
 // This example code is in the public domain.
 
 
-char deviceID = 2;
+char deviceID = 6;
 char bytesToRead = 5;
 
 #include <Wire.h>
@@ -24,8 +24,8 @@ void loop() {
   Wire.requestFrom(deviceID, bytesToRead);
 
   while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character
-    Serial.print(c + '0');         // print the character
+    unsigned char c = Wire.read(); // receive a byte as character
+    Serial.println(c);         // print the character
   }
 
   delay(500);

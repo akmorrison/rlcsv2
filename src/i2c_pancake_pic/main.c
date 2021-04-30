@@ -33,7 +33,7 @@ void read_dip_inputs(void) {
     uint16_t new_dip = 0;
     new_dip |= (!PORTAbits.RA3) ? (1 << 0) : 0;
     new_dip |= (!PORTAbits.RA4) ? (1 << 1) : 0;
-    //new_dip |= (!PORTAbits.RA7) ? (1 << 2) : 0; // Stuck at HIGH ?!?
+    new_dip |= (!PORTAbits.RA7) ? (1 << 2) : 0;
     new_dip |= (!PORTAbits.RA6) ? (1 << 3) : 0;
     if(dip_inputs != new_dip) {
         dip_inputs = new_dip;
@@ -92,7 +92,10 @@ int main(int argc, char** argv) {
 //            led_heartbeat();
 //        }
         
-        if (analog_inputs[0] > 100) { set_led_on(); }
+//        if (dip_inputs > 6) { set_led_on(); }
+//        else { set_led_off(); }
+        
+        if (analog_inputs[0] > 30) { set_led_on(); }
         else { set_led_off(); }
         
         read_analog_inputs(STRAIN1, 0);
