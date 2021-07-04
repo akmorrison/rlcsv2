@@ -9,9 +9,11 @@
 #include "Arduino.h"
 #include "sd_handler.h"
 #include "linac.h"
+#include "i2c.h"
 
 void setup() {
     //initialize all outputs
+    i2c_init();
     init_outputs();
     init_daq_pins();
     radio_init();
@@ -61,7 +63,7 @@ void loop() {
 
     //deal with the nodeio.ioio stuff
     nio_refresh();
-    
+
     //deal with linear actuator
 
     linac_refresh();
